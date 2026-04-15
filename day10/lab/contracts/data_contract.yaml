@@ -1,19 +1,21 @@
 # Data contract — Lab Day 10 (tiếp nối artifact CS + IT Helpdesk)
-# Sinh viên bổ sung owner, SLA freshness, và nguồn canonical.
+# Đã điền: owner, SLA, nguồn canonical.
 
 version: "1.0"
 dataset: "kb_chunk_export"
-owner_team: "__TODO__"
+owner_team: "Lab03-Day10-Team (AI in Action)"
 
 schema_cleaned:
   chunk_id:
     type: string
     required: true
-    description: "ID ổn định sau clean (thường hash hoặc doc_id + seq)"
+    description: "ID ổn định sau clean: doc_id_seq_sha256[0:16]"
   doc_id:
     type: string
     required: true
     description: "Khóa logic tài liệu nguồn (vd policy_refund_v4)"
+    constraints:
+      pattern: "^[a-z0-9_]+$"
   chunk_text:
     type: string
     required: true
@@ -22,6 +24,7 @@ schema_cleaned:
   effective_date:
     type: date
     required: true
+    description: "ISO 8601 (YYYY-MM-DD); quarantine nếu parse fails"
   exported_at:
     type: datetime
     required: true
@@ -32,21 +35,30 @@ quality_rules:
   - id: "no_stale_refund_window"
     description: "Không được để chunk policy refund chứa cửa sổ 14 ngày (lệch so với v4 = 7 ngày)"
     severity: "halt"
+  - id: "no_bom_in_chunk"
+    description: "Không chunk nào được chứa BOM UTF-8 (U+FEFF)"
+    severity: "halt"
+  - id: "no_legacy_or_test_doc_id"
+    description: "doc_id không được chứa 'legacy', 'test', 'xyz', 'catalog'"
+    severity: "halt"
 
 freshness:
   measured_at: "publish"  # ingest | cleaned | publish
   sla_hours: 24
-  alert_channel: "__TODO__"
+  alert_channel: "log_only"
 
 canonical_sources:
   - path: "data/docs/policy_refund_v4.txt"
     doc_id: "policy_refund_v4"
+    version: "v4"
   - path: "data/docs/sla_p1_2026.txt"
     doc_id: "sla_p1_2026"
+    version: "2026"
   - path: "data/docs/it_helpdesk_faq.txt"
     doc_id: "it_helpdesk_faq"
   - path: "data/docs/hr_leave_policy.txt"
     doc_id: "hr_leave_policy"
+    version: "2026"
 
 # Baseline allowlist export — nhóm mở rộng doc mới phải đồng bộ cleaning_rules + contract.
 allowed_doc_ids:
@@ -55,6 +67,6 @@ allowed_doc_ids:
   - it_helpdesk_faq
   - hr_leave_policy
 
-# Merit/Distinction: có thể đưa cutoff versioning vào env và tham chiếu ở đây (tránh hard-code trong code).
+# Version cutoff: HR policy chỉ chấp nhận effective_date >= 2026-01-01
 policy_versioning:
   hr_leave_min_effective_date: "2026-01-01"

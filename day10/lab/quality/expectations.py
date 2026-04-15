@@ -1,7 +1,10 @@
 """
 Expectation suite đơn giản (không bắt buộc Great Expectations).
 
-Sinh viên có thể thay bằng GE / pydantic / custom — miễn là có halt có kiểm soát.
+Baseline gồm 6 expectation. SINH VIÊN THÊM ≥2 EXPECTATION MỚI:
+  E7. no_bom_flagged       — không chunk nào có _flag_bom (BOM không được để lọt qua)
+  E8. no_legacy_doc_id     — không chunk nào có doc_id chứa 'legacy' hoặc 'xyz'
+Mỗi expectation phân biệt warn/halt rõ ràng.
 """
 
 from __future__ import annotations
@@ -109,6 +112,39 @@ def run_expectations(cleaned_rows: List[Dict[str, Any]]) -> Tuple[List[Expectati
             ok6,
             "halt",
             f"violations={len(bad_hr_annual)}",
+        )
+    )
+
+    # =================================================================
+    # NEW EXPECTATIONS (≥2 required)
+    # =================================================================
+
+    # E7: no_bom_flagged — không chunk nào có _flag_bom (BOM không được lọt qua clean)
+    bom_rows = [r for r in cleaned_rows if r.get("_flag_bom")]
+    ok7 = len(bom_rows) == 0
+    results.append(
+        ExpectationResult(
+            "no_bom_flagged",
+            ok7,
+            "halt",
+            f"bom_chunks={len(bom_rows)}",
+        )
+    )
+
+    # E8: no_legacy_or_test_doc_id — không doc_id chứa 'legacy', 'test', 'xyz', 'catalog'
+    #    (phát hiện export không được dọn — còn artifact tạo từ bên thứ 3)
+    legacy_pattern = re.compile(r"(legacy|test|xyz|catalog)", re.IGNORECASE)
+    legacy_rows = [
+        r for r in cleaned_rows
+        if legacy_pattern.search(r.get("doc_id") or "")
+    ]
+    ok8 = len(legacy_rows) == 0
+    results.append(
+        ExpectationResult(
+            "no_legacy_or_test_doc_id",
+            ok8,
+            "halt",
+            f"legacy_doc_id_count={len(legacy_rows)}",
         )
     )
 
