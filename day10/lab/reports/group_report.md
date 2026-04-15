@@ -86,10 +86,13 @@ Row 2: "Yêu cầu hoàn tiền được chấp nhận trong vòng 14 ngày làm
 Row 2: "Yêu cầu hoàn tiền được chấp nhận trong vòng 7 ngày làm việc kể từ xác nhận đơn (ghi chú: bản sync cũ policy-v3 — lỗi migration). [cleaned: stale_refund_window]"
 ```
 
-**Grading JSONL** (`artifacts/eval/grading_run.jsonl`):
-- `gq_d10_01`: `contains_expected=true`, `hits_forbidden=false` ✅
-- `gq_d10_02`: `contains_expected=true` ✅
-- `gq_d10_03`: `contains_expected=true`, `hits_forbidden=false`, `top1_doc_matches=true` ✅
+**Grading JSONL** (`artifacts/eval/grading_run.jsonl`) — chạy với `data/grading_questions.json` thật:
+
+| Câu | Câu hỏi | Kết quả |
+|-----|---------|---------|
+| `gq_d10_01` | "Theo policy hoàn tiền nội bộ, khách có tối đa bao nhiêu ngày làm việc để gửi yêu cầu hoàn tiền sau khi đơn được xác nhận?" | `contains_expected=true`, `hits_forbidden=false` ✅ |
+| `gq_d10_02` | "Ticket P1: thời gian resolution SLA là bao nhiêu giờ?" | `contains_expected=true` ✅ |
+| `gq_d10_03` | "Theo chính sách nghỉ phép hiện hành (2026), nhân viên dưới 3 năm kinh nghiệm được bao nhiêu ngày phép năm?" | `contains_expected=true`, `hits_forbidden=false`, `top1_doc_matches=true` (top1=`hr_leave_policy`) ✅ |
 
 ---
 

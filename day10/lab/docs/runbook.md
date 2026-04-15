@@ -29,8 +29,8 @@ grep "expectation\[" artifacts/logs/run_*.log
 # Kiểm tra quarantine
 cat artifacts/quarantine/quarantine_*.csv
 
-# Chạy eval retrieval
-python eval_retrieval.py --out artifacts/eval/check_eval.csv
+# Chạy eval retrieval (dùng grading_questions.json)
+python eval_retrieval.py --questions data/grading_questions.json --out artifacts/eval/check_eval.csv
 
 # Kiểm tra manifest freshness
 python etl_pipeline.py freshness --manifest artifacts/manifests/manifest_<run-id>.json

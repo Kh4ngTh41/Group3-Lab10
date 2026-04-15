@@ -1,6 +1,6 @@
 # Báo Cáo Cá Nhân — Lab Day 10: Data Pipeline & Data Observability
 
-**Họ và tên:** Le Van C
+**Họ và tên:** Thái Tuấn Khang
 **Vai trò:** Embed & Idempotency Owner
 **Ngày nộp:** 2026-04-15
 
